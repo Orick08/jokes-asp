@@ -1,7 +1,18 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0
+#Generate base SDK
+FROM mcr.microsoft.com/dotnet/sdk:6.0 as build-env
+WORKDIR /app
 
-WORKDIR /home/app
+#Copy csproj
+COPY *.csproj ./
+RUN dotnet restore
+
+#Copy the project files and publish
 COPY . ./
-RUN dotnet publish
+RUN dotnet publish -c Release -o out
 
-ENTRYPOINT ["dotnet", "bin/Debug/net6.0/jokes.dll"]
+#Generate runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:6.0
+WORKDIR /app
+EXPOSE 80
+COPY --from=build-env /app/out .
+ENTRYPOINT ["dotnet", "jokes.dll"]
