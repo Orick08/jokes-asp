@@ -13,6 +13,7 @@ RUN dotnet publish -c Release -o out
 #Generate runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 WORKDIR /app
-EXPOSE 80
+ENV ASPNETCORE_URLS=http://*:8080
+EXPOSE 8080
 COPY --from=build-env /app/out .
 ENTRYPOINT ["dotnet", "jokes.dll"]
